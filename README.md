@@ -21,3 +21,9 @@ Screenshots provided
 - For /home make volume for snapshots
 - Add mounting at fstab
 - Practice with snapshots
+
+## Lesson 05
+
+- Determine the best compression algorithm
+- Determine pool's parameters
+- Find message from teachers

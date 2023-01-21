@@ -1,0 +1,30 @@
+[root@zfs vagrant]# wget -O otus_task2.file https://drive.google.com/u/0/uc?id=1gH8gCL9y7Nd5Ti3IRmplZPF1XjzxeRAG&export=download
+[1] 13503
+[root@zfs vagrant]# --2023-01-21 22:12:57--  https://drive.google.com/u/0/uc?id=1gH8gCL9y7Nd5Ti3IRmplZPF1XjzxeRAG
+Resolving drive.google.com (drive.google.com)... 108.177.14.194, 2a00:1450:4010:c0f::c2
+Connecting to drive.google.com (drive.google.com)|108.177.14.194|:443... connected.
+HTTP request sent, awaiting response... 302 Found
+Location: https://drive.google.com/uc?id=1gH8gCL9y7Nd5Ti3IRmplZPF1XjzxeRAG [following]
+--2023-01-21 22:12:58--  https://drive.google.com/uc?id=1gH8gCL9y7Nd5Ti3IRmplZPF1XjzxeRAG
+Reusing existing connection to drive.google.com:443.
+HTTP request sent, awaiting response... 303 See Other
+Location: https://doc-00-bo-docs.googleusercontent.com/docs/securesc/ha0ro937gcuc7l7deffksulhg5h7mbp1/qi2m1st355k7i0gidr0vkd0vtbeubp86/1674339150000/16189157874053420687/*/1gH8gCL9y7Nd5Ti3IRmplZPF1XjzxeRAG?uuid=985f21f8-f81d-4653-84ee-527be0a1a82f [following]
+Warning: wildcards not supported in HTTP.
+--2023-01-21 22:13:02--  https://doc-00-bo-docs.googleusercontent.com/docs/securesc/ha0ro937gcuc7l7deffksulhg5h7mbp1/qi2m1st355k7i0gidr0vkd0vtbeubp86/1674339150000/16189157874053420687/*/1gH8gCL9y7Nd5Ti3IRmplZPF1XjzxeRAG?uuid=985f21f8-f81d-4653-84ee-527be0a1a82f
+Resolving doc-00-bo-docs.googleusercontent.com (doc-00-bo-docs.googleusercontent.com)... 64.233.161.132, 2a00:1450:4010:c01::84
+Connecting to doc-00-bo-docs.googleusercontent.com (doc-00-bo-docs.googleusercontent.com)|64.233.161.132|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 5432736 (5.2M) [application/octet-stream]
+Saving to: 'otus_task2.file'
+
+100%[==================================================================================================================================================>] 5,432,736   19.2MB/s   in 0.3s   
+
+2023-01-21 22:13:02 (19.2 MB/s) - 'otus_task2.file' saved [5432736/5432736]
+
+
+[1]+  Done                    wget -O otus_task2.file https://drive.google.com/u/0/uc?id=1gH8gCL9y7Nd5Ti3IRmplZPF1XjzxeRAG
+[root@zfs vagrant]# zfs receive otus/test@today < otus_task2.file
+[root@zfs vagrant]# find /otus/test -name "secret_message"
+/otus/test/task1/file_mess/secret_message
+[root@zfs vagrant]# cat /otus/test/task1/file_mess/secret_message
+https://github.com/sindresorhus/awesome
