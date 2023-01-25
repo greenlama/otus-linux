@@ -27,3 +27,9 @@ Screenshots provided
 - Determine the best compression algorithm
 - Determine pool's parameters
 - Find message from teachers
+
+## Lesson 06
+
+- Deploy 2 VMs using Vagrant
+- Share directory with 'upload' directory on NFS server
+- Automount shared directory on client
