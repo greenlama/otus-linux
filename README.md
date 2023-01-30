@@ -33,3 +33,8 @@ Screenshots provided
 - Deploy 2 VMs using Vagrant
 - Share directory with 'upload' directory on NFS server
 - Automount shared directory on client
+
+# Lesson 07
+
+- Create RPM package
+- Create local repo and place there previously created package
