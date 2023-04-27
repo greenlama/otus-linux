@@ -1,0 +1,23 @@
+---
+- name: Setup log server
+  hosts: log
+  become: True
+  gather_facts: False
+  vars:
+  - remote_server: web
+  - ip: 192.168.56.100
+  - dns: web
+  roles:
+    - log
+- name: Setup web server with nginx
+  hosts: web
+  become: True
+  gather_facts: False
+  vars:
+    - nginx_listen_port: 8080
+    - remote_server: log
+    - ip: 192.168.56.101
+    - dns: log
+  roles:
+    - web
+...
