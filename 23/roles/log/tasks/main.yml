@@ -1,0 +1,48 @@
+---
+- name: add "{{ ip }} {{ dns }}" to hosts
+  lineinfile:
+    path: /etc/hosts
+    state: present
+    line: '{{ ip }} {{ dns }}'
+
+- name: configure rsyslog server
+  lineinfile:
+    path: /etc/rsyslog.conf
+    regexp: '^#({{ item.config }}.*)'
+    line: '\1'
+    backrefs: yes
+  loop:
+    - { config: '\$ModLoad imudp' }
+    - { config: '\$UDPServerRun 514' }
+  notify: restart rsyslog
+
+- name: configure rsyslog server
+  lineinfile:
+    path: /etc/rsyslog.conf
+    regexp: '^#({{ item.config }}.*)'
+    line: '\1'
+    backrefs: yes
+  loop:
+    - { config: '\$ModLoad imtcp' }
+    - { config: '\$InputTCPServerRun 514' }
+  notify: restart rsyslog
+
+- name: Insert messages template
+  lineinfile:
+    path: /etc/rsyslog.conf
+    state: present
+    line: "{{ item }}"
+  with_items:
+  - '# Add remote logs'
+  - '$template RemoteLogs,"/var/log/rsyslog/%HOSTNAME%/%PROGRAMNAME%.log"'
+  - '*.* ?RemoteLogs'
+  - '& ~'
+
+- name: listen for port 60
+  lineinfile:
+    path: /etc/audit/auditd.conf
+    regexp: '^##(tcp_listen_port = 60)$'
+    line: '\1'
+    backrefs: yes
+  notify: restart audit
+...

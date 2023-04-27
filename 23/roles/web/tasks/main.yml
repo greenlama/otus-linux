@@ -1,0 +1,71 @@
+---
+- name: add "{{ ip }} {{ dns }}" to hosts
+  lineinfile:
+    path: /etc/hosts
+    state: present
+    line: '{{ ip }} {{ dns }}'
+
+- name: install epel
+  yum:
+    name: epel-release
+    state: present
+
+- name: install nginx
+  yum:
+    name: nginx
+    state: present
+  notify: restart nginx
+
+- name: NGINX | Create NGINX config file from template
+  template:
+    src: templates/nginx.conf.j2
+    dest: /etc/nginx/nginx.conf
+  notify:
+    - reload nginx
+
+- name: configure rsyslog to send critical errors to remote server
+  blockinfile:
+    path: /etc/rsyslog.conf
+    marker: "# {mark} ANSIBLE MANAGED BLOCK: remote logging"
+    content: |
+      # ### begin forwarding rule ###
+      *.crit @{{ remote_server }}:514
+      # ### end of the forwarding rule ###
+  notify: restart rsyslog
+
+- name: add audit rule to monitor config changes
+  template:
+      dest: /etc/audit/rules.d/nginx_conf.rules
+      src: templates/audit.rules.j2
+  notify: restart audit
+
+- name: change name format for auditd
+  lineinfile:
+    path: /etc/audit/auditd.conf
+    regexp: "name_format = NONE"
+    line: "name_format = HOSTNAME"
+    owner: root
+    group: root
+    mode: "0640"
+
+- name: install audisp plugin for remote logging
+  yum:
+    name: audispd-plugins
+    state: present
+
+- name: config remote server ip
+  lineinfile:
+    path: /etc/audisp/audisp-remote.conf
+    regexp: 'remote_server ='
+    line: 'remote_server = {{ remote_server }}'
+    backrefs: yes
+  notify: restart audit
+
+- name: enable auditd remote logging
+  lineinfile:
+    path: /etc/audisp/plugins.d/au-remote.conf
+    regexp: 'active = no'
+    line: 'active = yes'
+    backrefs: yes
+  notify: restart audit
+...
