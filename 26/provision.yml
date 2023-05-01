@@ -1,0 +1,41 @@
+---
+- name: Set net.ipv4.conf.all.forwarding = 1
+  hosts:
+    - inetRouter
+    - centralRouter
+    - office1Router
+    - office2Router
+  become: True
+  roles:
+    - forwarding-on
+- name: Setup eth gateway config
+  hosts:
+    - inetRouter
+    - centralRouter
+    - centralServer
+    - office1Router
+    - office1Server
+    - office2Router
+    - office2Server
+  become: True
+  roles:
+    - routing
+- name: Internet-server initialization
+  hosts:
+    - inetRouter
+  become: True
+  roles:
+    - internet-router
+- name: Network hosts initialization
+  hosts:
+    - inetRouter
+    - centralRouter
+    - centralServer
+    - office1Router
+    - office1Server
+    - office2Router
+    - office2Server
+  become: True
+  roles:
+    - network-hosts
+...
