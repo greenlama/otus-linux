@@ -1,0 +1,6 @@
+---
+dhcp_network: 192.168.0.0
+dhcp_mask: 255.255.255.0
+dhcp_range_min: 192.168.56.50
+dhcp_range_max: 192.168.56.99
+pxe_server: 192.168.56.101
