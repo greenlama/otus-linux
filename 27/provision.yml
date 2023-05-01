@@ -1,0 +1,7 @@
+---
+- name: Setup pxeserver
+  hosts: pxeserver
+  become: True
+  gather_facts: False
+  roles:
+    - pxeserver
