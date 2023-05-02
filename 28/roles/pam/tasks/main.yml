@@ -1,0 +1,44 @@
+---
+- name: Create admin group
+  ansible.builtin.group:
+    name: admin
+    state: present
+
+- name: Create user otusadm
+  ansible.builtin.user:
+    name: otusadm
+    shell: /bin/bash
+    groups: admin
+    append: true
+    password: '$6$3CcV692j2OcmorGM$kufd1fiqwZp6y7998ZTKLtt8L/zd/U/clxqU0hA7RcHnAEDHLk7FTwYhhX9pQKPgQT8UDbPRw1lV2Ust/EAaS.'
+
+- name: Create user otus
+  ansible.builtin.user:
+    name: otus
+    shell: /bin/bash
+    password: '$6$3CcV692j2OcmorGM$kufd1fiqwZp6y7998ZTKLtt8L/zd/U/clxqU0hA7RcHnAEDHLk7FTwYhhX9pQKPgQT8UDbPRw1lV2Ust/EAaS.'
+
+- name: Add vagrant user to admin group
+  ansible.builtin.user:
+    name: vagrant
+    groups: admin
+    append: true
+
+- name: Add root user to admin group
+  ansible.builtin.user:
+    name: root
+    groups: admin
+    append: true
+
+- name: Copy script
+  template:
+    src: templates/login.sh.j2
+    dest: /usr/local/bin/login.sh
+    mode: 0755
+
+- name: Edit pam
+  ansible.builtin.lineinfile:
+    path: /etc/pam.d/sshd
+    insertafter: '^auth       include      postlogin\n'
+    line: 'auth       required     pam_exec.so /usr/local/bin/login.sh'
+...

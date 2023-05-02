@@ -1,0 +1,7 @@
+---
+- name: Setup pam
+  hosts: pam
+  become: True
+  gather_facts: False
+  roles:
+    - pam
