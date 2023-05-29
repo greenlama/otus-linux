@@ -1,0 +1,54 @@
+---
+- name: Setup eth gateway config
+  hosts:
+    - inetRouter
+    - inetRouterSecond
+    - centralRouter
+    - centralServer
+  become: True
+  roles:
+    - routing
+
+- name: Internet-server initialization
+  hosts:
+    - inetRouter
+    - inetRouterSecond
+  become: True
+  roles:
+    - internet-router
+
+- name: Setup password authentication
+  hosts:
+    - inetRouter
+  become: True
+  roles:
+    - password-auth
+
+- name: Configure port-knocking target
+  hosts:
+    - inetRouter
+  become: True
+  roles:
+    - port-knocking-target
+
+- name: Setup port-knocking client program
+  hosts:
+    - centralRouter
+  become: True
+  roles:
+    - port-knocking-client
+
+- name: Deploy nginx
+  hosts:
+    - centralServer
+  become: True
+  roles:
+    - nginx
+
+- name: Configure port forwarding
+  hosts:
+    - inetRouterSecond
+  become: True
+  roles:
+    - port-forwarding
+...
