@@ -1,0 +1,64 @@
+---
+- name: Make /etc/resolv.conf mutable
+  ansible.builtin.file:
+    path: /etc/resolv.conf
+    attributes: -i
+
+- name: Remove /etc/resolv.conf
+  ansible.builtin.file:
+    path: /etc/resolv.conf
+    state: absent
+
+- name: Restart network service
+  ansible.builtin.systemd:
+    state: restarted
+    name: network
+
+- name: Uninstall packages
+  ansible.builtin.yum:
+    name: {{ item }}
+    state: absent
+  with_items:
+    - bind
+    - bind-utils
+    - ntp
+
+- name: Install packages
+  ansible.builtin.yum: 
+    name: {{ item }}
+    state: latest
+  with_items:
+    - bind
+    - bind-utils
+    - ntp
+
+- name: Copy transfer key to all servers and the client
+  ansible.builtin.copy:
+    src: named.zonetransfer.key
+    dest: /etc/named.zonetransfer.key
+    owner: root
+    group: named
+    mode: 0644
+
+- name: Register NetworkManager.conf content
+  ansible.builtin.command: /bin/cat /etc/NetworkManager/NetworkManager.conf
+  register: network_manager_conf
+
+- name: Fix NetworkManager.conf
+  ansible.builtin.lineinfile:
+    insertafter: '\[main\]'
+    dest: /etc/NetworkManager/NetworkManager.conf
+    line: "dns=none"
+  when: not network_manager_conf is search("dns=")
+
+- name: Still fix NetworkManager.conf
+  ansible.builtin.replace:
+    path: /etc/NetworkManager/NetworkManager.conf
+    regexp: 'dns=.*'
+    replace: 'dns=none'
+
+- name: Restart network service
+  ansible.builtin.systemd:
+    state: restarted
+    name: network
+    enabled: True
