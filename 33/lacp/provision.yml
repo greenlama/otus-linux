@@ -1,0 +1,9 @@
+---
+- name: Bond config
+  hosts:
+    - inetRouter
+    - centralRouter
+  become: True
+  roles:
+    - create_bond
+...

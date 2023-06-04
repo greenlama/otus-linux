@@ -1,0 +1,74 @@
+networks_hosts:
+  inetRouter:
+    bonds:
+      - {
+        DEVICE: bond0,
+        NAME: bond0,
+        TYPE: Bond,
+        BONDING_MASTER: "yes",
+        IPADDR: 192.168.1.1,
+        NETMASK: 255.255.255.252,
+        ONBOOT: "yes",
+        DEFROUTE: "yes",
+        USERCTL: "no",
+        BONDING_OPTS: '"mode=1 miimon=100 primary=eth1 primary_select=always downdelay=200 updelay=200"',
+      }
+      - {
+        DEVICE: eth1,
+        NAME: eth1,
+        TYPE: Ethernet,
+        SLAVE: "yes",
+        MASTER: bond0,
+        BOOTPROTO: 'none',
+        ONBOOT: "yes",
+        USERCTL: "no",
+        NM_CONTROLLED: "no",
+      }
+      - {
+        DEVICE: eth2,
+        NAME: eth2,
+        TYPE: Ethernet,
+        SLAVE: "yes",
+        MASTER: bond0,
+        BOOTPROTO: 'none',
+        ONBOOT: "yes",
+        USERCTL: "no",
+        NM_CONTROLLED: "no",
+      }
+  centralRouter:
+    bonds:
+      - {
+        DEVICE: bond0,
+        NAME: bond0,
+        TYPE: Bond,
+        BONDING_MASTER: "yes",
+        IPADDR: 192.168.1.2,
+        NETMASK: 255.255.255.252,
+        GATEWAY: 192.168.1.1,
+        ONBOOT: "yes",
+        DEFROUTE: "yes",
+        USERCTL: "no",
+        BONDING_OPTS: '"mode=1 miimon=100 primary=eth1 primary_select=always downdelay=200 updelay=200"', # ls /sys/class/net/bond0/bonding/
+      }
+      - {
+        DEVICE: eth1,
+        NAME: eth1,
+        TYPE: Ethernet,
+        SLAVE: "yes",
+        MASTER: bond0,
+        BOOTPROTO: 'none',
+        ONBOOT: "yes",
+        USERCTL: "no",
+        NM_CONTROLLED: "no",
+      }
+      - {
+        DEVICE: eth2,
+        NAME: eth2,
+        TYPE: Ethernet,
+        SLAVE: "yes",
+        MASTER: bond0,
+        BOOTPROTO: 'none',
+        ONBOOT: "yes",
+        USERCTL: "no",
+        NM_CONTROLLED: "no",
+      }

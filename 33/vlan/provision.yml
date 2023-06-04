@@ -1,0 +1,35 @@
+---
+- name: ethX gateway config
+  hosts:
+    - inetRouter
+    - centralRouter
+    - centralServer
+    - office1Router
+    - office1Server
+    - office2Router
+    - office2Server
+    - testServer1
+    - testServer2
+    - testClient1
+    - testClient2
+  become: True
+  roles:
+    - routing
+
+- name: Internet-router initialization
+  hosts:
+    - inetRouter
+  become: True
+  roles:
+    - internet-router
+
+- name: Create vlans
+  hosts:
+    - testServer1
+    - testServer2
+    - testClient1
+    - testClient2
+  become: True
+  roles:
+    - create_vlan
+...

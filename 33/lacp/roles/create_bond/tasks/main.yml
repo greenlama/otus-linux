@@ -1,0 +1,20 @@
+---
+- name: Set "NOZEROCONF=yes"
+  shell: |
+    echo "NOZEROCONF=yes" > /etc/sysconfig/network
+    exit 0
+  ignore_errors: false
+
+- name: Delete interfaces
+  shell: |
+    rm -f /etc/sysconfig/network-scripts/ifcfg-{{ item.DEVICE }}
+    exit 0
+  loop: "{{ networks_hosts[inventory_hostname]['bonds'] }}"
+
+- name: Create bond
+  copy:
+    content: "{% for key in item %}{{ key }}={{ item[key] }}\n{% endfor %}"
+    dest: /etc/sysconfig/network-scripts/ifcfg-{{item.DEVICE}}
+  loop: "{{ networks_hosts[inventory_hostname]['bonds'] }}"
+  notify:
+    - systemctl-restart-network
