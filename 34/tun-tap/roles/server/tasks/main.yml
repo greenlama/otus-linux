@@ -1,0 +1,45 @@
+---
+- name: Install EPEL Repo package from standart repo
+  yum:
+    name: epel-release
+    state: present
+
+- name: Install openvpn
+  yum:
+    name: openvpn
+    state: present
+
+- name: Install iperf3
+  yum:
+    name: iperf3
+    state: present
+
+- name: Disable SELinux
+  ansible.posix.selinux:
+    state: disabled
+
+- name: Generate key
+  ansible.builtin.shell: openvpn --genkey --secret /etc/openvpn/static.key
+
+- name: Store key to local
+  ansible.builtin.fetch:
+    src: /etc/openvpn/static.key
+    dest: /tmp/static.key
+
+- name: Copy vpn config
+  template:
+    src: server.conf.j2
+    dest: /etc/openvpn/server.conf
+
+- name: Copy service file
+  template:
+    src: openvpn.service.j2
+    dest: /etc/systemd/system/openvpn@.service
+
+- name: Start service openvpn service
+  ansible.builtin.systemd:
+    state: started
+    daemon_reload: true
+    name: openvpn@server
+    enabled: true
+

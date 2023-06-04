@@ -1,0 +1,81 @@
+---
+- name: Install EPEL Repo package from standart repo
+  yum:
+    name: epel-release
+    state: present
+
+- name: Install openvpn
+  yum:
+    name: openvpn
+    state: present
+
+- name: Install easy-rsa
+  yum:
+    name: easy-rsa
+    state: present
+
+- name: Disable SELinux
+  ansible.posix.selinux:
+    state: disabled
+
+- name: Initiate PKI
+  ansible.builtin.shell: /usr/share/easy-rsa/3.0.8/easyrsa init-pki
+  args:
+    chdir: /etc/openvpn/
+
+- name: Generate build-ca
+  ansible.builtin.shell: echo 'rasvpn' | /usr/share/easy-rsa/3.0.8/easyrsa build-ca nopass
+  args:
+    chdir: /etc/openvpn/
+
+- name: Generate gen-req for server
+  ansible.builtin.shell: echo 'rasvpn' | /usr/share/easy-rsa/3.0.8/easyrsa gen-req server nopass
+  args:
+    chdir: /etc/openvpn/
+
+- name: Generate sign-req for server
+  ansible.builtin.shell: echo 'yes' | /usr/share/easy-rsa/3.0.8/easyrsa sign-req server server
+  args:
+    chdir: /etc/openvpn/
+
+- name: Run gen-dh
+  ansible.builtin.shell: /usr/share/easy-rsa/3.0.8/easyrsa gen-dh
+  args:
+    chdir: /etc/openvpn/
+
+- name: Generate ca.key
+  ansible.builtin.shell: openvpn --genkey --secret ca.key
+  args:
+    chdir: /etc/openvpn/
+
+- name: Generate gen-req for client
+  ansible.builtin.shell: echo 'client' | /usr/share/easy-rsa/3/easyrsa gen-req client nopass
+  args:
+    chdir: /etc/openvpn/
+
+- name: Generate sign-req for client
+  ansible.builtin.shell: echo 'yes' | /usr/share/easy-rsa/3/easyrsa sign-req client client
+  args:
+    chdir: /etc/openvpn/
+
+- name: Copy vpn config
+  template:
+    src: server.conf.j2
+    dest: /etc/openvpn/server.conf
+
+- name: Add iroute parameter
+  ansible.builtin.lineinfile:
+    path: /etc/openvpn/client/client
+    line: iroute 10.10.10.0 255.255.255.0
+
+- name: Copy service file
+  template:
+    src: openvpn.service.j2
+    dest: /etc/systemd/system/openvpn@.service
+
+- name: Start service openvpn service
+  ansible.builtin.systemd:
+    state: started
+    daemon_reload: true
+    name: openvpn@server
+    enabled: true

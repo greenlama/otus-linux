@@ -1,0 +1,8 @@
+---
+- name: Install packages
+  hosts:
+    - server
+  become: True
+  roles:
+    - server
+...

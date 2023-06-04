@@ -1,0 +1,15 @@
+---
+- name: Install packages
+  hosts:
+    - server
+  become: True
+  roles:
+    - server
+
+- name: Internet-server initialization
+  hosts:
+    - client
+  become: True
+  roles:
+    - client
+...
