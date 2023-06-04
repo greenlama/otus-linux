@@ -1,0 +1,23 @@
+---
+- name: Common tasks
+  hosts:
+    - all
+  become: True
+  roles:
+    - common
+
+- name: ns01
+  hosts:
+    - ns01
+  become: True
+  roles:
+    - ns01
+
+- name: Clients
+  hosts:
+    - client1
+    - client2
+  become: True
+  roles:
+    - client
+...

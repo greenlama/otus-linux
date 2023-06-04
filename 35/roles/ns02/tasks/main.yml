@@ -1,0 +1,43 @@
+---
+- name: Remove /etc/named.conf
+  ansible.builtin.file:
+    path: /etc/named.conf
+    state: absent
+
+- name: Remove /etc/named/*
+  ansible.builtin.shell: |
+    rm -f /etc/named/*
+
+- name: Copy named.conf
+  ansible.builtin.copy:
+    src: slave-named.conf
+    dest: /etc/named.conf
+    owner: root
+    group: named
+    mode: 0640
+
+- name: Copy resolv.conf to the servers
+  ansible.builtin.copy:
+    src: servers-resolv.conf
+    dest: /etc/resolv.conf
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Make /etc/resolv.conf immutable
+  ansible.builtin.file:
+    path: /etc/resolv.conf
+    attributes: +i
+
+- name: Set /etc/named permissions
+  ansible.builtin.file:
+    path: /etc/named
+    owner: root
+    group: named
+    mode: 0670
+
+- name: Restart named service
+  ansible.builtin.systemd:
+    state: restarted
+    name: named
+    enabled: True
