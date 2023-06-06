@@ -1,0 +1,64 @@
+---
+- name: install softs on CentOS
+  yum:
+    name:
+      - vim
+      - chrony
+    state: present
+    update_cache: true
+
+#Отключение firewalld и удаление его из автозагрузки
+- name: disable firewalld
+  service:
+    name: firewalld
+    state: stopped
+    enabled: false
+
+#Отключение SElinux из автозагрузки
+#Будет применено после перезагрузки
+- name: disable SElinux
+  selinux:
+    state: disabled
+
+#Отключение SElinux до перезагрузки
+- name: disable SElinux now
+  shell: setenforce 0
+
+#Установка временной зоны Европа/Москва    
+- name: Set up timezone
+  timezone:
+    name: "Europe/Moscow"
+
+#Запуск службы Chrony, добавление её в автозагрузку
+- name: enable chrony
+  service:
+    name: chronyd
+    state: restarted
+    enabled: true
+
+#Копирование файла /etc/hosts c правами root:root 0644
+- name: change /etc/hosts
+  template:
+    src: hosts.j2
+    dest: /etc/hosts
+    owner: root
+    group: root
+    mode: 0644
+
+- name: install module DL1
+  yum:
+    name:
+      - @idm:DL1
+    state: present
+    update_cache: true
+
+#Установка сервера Freeipa
+- name: install module ipa-client
+  yum:
+    name:
+      - ipa-server
+    state: present
+    update_cache: true
+
+- name: Run the FreeIPA server installer
+  command: ipa-server-install --unattended --hostname=ipa.otus.lan --domain=otus.lan --realm=OTUS.LAN --ip-address=192.168.56.10 --ds-password Aa12345678 --admin-password Aa12345678 --no-ntp
