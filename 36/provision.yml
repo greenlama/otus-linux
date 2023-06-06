@@ -1,0 +1,16 @@
+---
+- name: Install FreeIPA
+  hosts:
+    - ipa.otus.lan
+  become: True
+  roles:
+    - ipa
+
+- name: Install ipa clients
+  hosts:
+    - client1.otus.lan
+    - client2.otus.lan
+  become: True
+  roles:
+    - client
+...
