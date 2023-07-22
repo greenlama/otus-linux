@@ -1,0 +1,16 @@
+---
+- name: Install postgresql server
+  yum:
+    name: postgresql11-server
+    state: present
+
+- name: Initialise database
+  command: /usr/pgsql-11/bin/postgresql-11-setup initdb
+  args:
+    creates: /var/lib/pgsql/11/data/postgresql.conf
+
+- name: Start postgresql service
+  systemd:
+    name: postgresql-11.service
+    state: started
+    enabled: yes

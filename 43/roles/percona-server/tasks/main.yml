@@ -3,7 +3,6 @@
   yum:
     name: https://repo.percona.com/yum/percona-release-latest.noarch.rpm
     state: present
-  when: percona_release_installed.stdout == ""
 
 - name: Install percona
   yum:
