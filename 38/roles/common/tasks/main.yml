@@ -1,0 +1,43 @@
+---
+- name: Set time-zone
+  ansible.builtin.copy:
+    remote_src: True
+    src: /usr/share/zoneinfo/Europe/Moscow
+    dest: /etc/localtime
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Restart service cron
+  ansible.builtin.systemd:
+    state: restarted
+    daemon_reload: true
+    name: crond
+
+- name: Install EPEL Repo package from standart repo
+  ansible.builtin.yum:
+    name: epel-release
+    state: present
+
+- name: Install borgbackup
+  ansible.builtin.yum:
+    name: borgbackup
+    state: present
+
+- name: Put SELinux in permissive mode.
+  ansible.posix.selinux:
+    policy: targeted
+    state: permissive
+
+- name: Generate RSA host key
+  ansible.builtin.command : ssh-keygen -q -t rsa -f /root/.ssh/id_rsa -C "" -N ""
+  args:
+    creates: /root/.ssh/id_rsa
+  when: "'client' in inventory_hostname"
+
+- name: Store ssh key to local folder
+  ansible.builtin.fetch:
+    src: /root/.ssh/id_rsa.pub
+    dest: /tmp/id_rsa.pub
+    flat: true
+  when: "'client' in inventory_hostname"

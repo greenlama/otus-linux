@@ -1,0 +1,12 @@
+---
+backups:
+  hosts:
+    backup:
+      ansible_host: 192.168.56.101
+clients:
+  hosts:
+    client:
+      ansible_host: 192.168.56.102
+
+vars:
+  ansible_user: vagrant

@@ -1,0 +1,31 @@
+---
+- name: Create borg repository
+  ansible.builtin.shell:
+    borg init --encryption=repokey borg@192.168.56.101:/var/backup/
+  environment:
+      BORG_PASSPHRASE: "{{ borgbackup_pass }}"
+  register: backup_init
+  changed_when: "'Write down the passphrase' in backup_init.stderr"
+
+- name: Copy borg service file
+  ansible.builtin.copy:
+    src: borg-backup.service
+    dest: /etc/systemd/system/borg-backup.service
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Copy borg timer file
+  ansible.builtin.copy:
+    src: borg-backup.timer
+    dest: /etc/systemd/system/borg-backup.timer
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Restart borg timer
+  ansible.builtin.systemd:
+    state: restarted
+    name: borg-backup.timer
+    enabled: true
+    daemon_reload: true
