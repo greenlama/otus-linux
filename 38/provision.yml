@@ -1,0 +1,19 @@
+---
+- hosts: all
+  become: true
+  gather_facts: true
+
+  # pre_tasks:
+  # - name: Wait connection
+  #   wait_for_connection:
+
+  # - name: Gathering facts
+  #   setup:
+
+  roles:
+    - role: common
+    - role: backup
+      when: inventory_hostname in groups['backups']
+    - role: client
+      when: inventory_hostname in groups['clients']
+...
