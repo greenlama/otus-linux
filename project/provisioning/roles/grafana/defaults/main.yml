@@ -1,0 +1,4 @@
+grafana_dashboards:
+  - dashboard_id: 1860
+    revision_id: 21
+    name: prometheus

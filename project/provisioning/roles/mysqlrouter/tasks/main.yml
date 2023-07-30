@@ -1,0 +1,46 @@
+---
+- name: Install mysql repository
+  yum:
+    name: https://repo.mysql.com/yum/mysql-8.0-community/el/7/aarch64/mysql80-community-release-el7-1.noarch.rpm
+    state: present
+    disable_gpg_check: true
+  tags:
+    - mysqlrouter
+    - mr-install-repo
+
+- name: Install mysqlrouter
+  yum:
+    name: mysql-router
+    state: present
+    disable_gpg_check: true
+  tags:
+    - mysqlrouter
+    - mr-install-mr
+
+- name: Update mysqlrouter configuration file
+  template:
+    src: mysqlrouter.conf.j2
+    dest: /etc/mysqlrouter/mysqlrouter.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart mysqlrouter
+  tags:
+    - mysqlrouter
+    - mr-conf
+
+- name: Enable mysqlrouter service
+  systemd:
+    name: mysqlrouter
+    enabled: true
+  tags:
+    - mysqlrouter
+    - mr-systemd-enable
+
+- name: Start mysqlrouter service
+  systemd:
+    name: mysqlrouter
+    state: started
+  tags:
+    - mysqlrouter
+    - mr-systemd-start

@@ -1,0 +1,65 @@
+---
+- name: Prepare for replication
+  shell: |
+    mysql -uroot -p{{ mysql_root_pwd }} -e "SET SQL_LOG_BIN=0;CREATE USER rpl_user@'%' IDENTIFIED WITH sha256_password BY 'Password123!';GRANT REPLICATION SLAVE ON *.* TO rpl_user@'%';FLUSH PRIVILEGES;SET SQL_LOG_BIN=1;CHANGE MASTER TO MASTER_USER='rpl_user', MASTER_PASSWORD='Password123!' FOR CHANNEL 'group_replication_recovery';"
+  register: prep_rep
+  when: mysql_init == true
+  tags:
+    - mysql
+    - mysql-master
+- debug:
+      var: prep_rep
+
+- name: Start replication
+  shell: |
+    mysql -uroot -p{{ mysql_root_pwd }} -e "SET GLOBAL group_replication_bootstrap_group=ON;START GROUP_REPLICATION;SET GLOBAL group_replication_bootstrap_group=OFF;"
+  register: start_rep
+  when: mysql_init == true
+  tags:
+    - mysql
+    - mysql-master
+- debug:
+      var: start_rep
+
+- name: Create wordpress database
+  shell: |
+    mysql -uroot -p{{ mysql_root_pwd }} -e "CREATE DATABASE wordpress CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+  register: create_db
+  when: mysql_init == true
+  tags:
+    - mysql
+    - mysql-master
+- debug:
+      var: create_db
+
+- name: Create wordpress user
+  shell: |
+    mysql -uroot -p{{ mysql_root_pwd }} -e "create user wordpress@192.168.1.93 identified WITH sha256_password by 'Password123!';grant all on wordpress.* to wordpress@192.168.1.93;create user wordpress@192.168.1.94 identified WITH sha256_password by 'Password123!';grant all on wordpress.* to wordpress@192.168.1.94;create user wordpress@192.168.1.90 identified WITH sha256_password by 'Password123!';grant all on wordpress.* to wordpress@192.168.1.90;flush privileges;"
+  register: create_wp_user
+  when: mysql_init == true
+  tags:
+    - mysql
+    - mysql-master
+- debug:
+      var: create_wp_user
+
+- name: Copy wordpress dump
+  copy:
+    src: files/mysqldump/
+    dest: /root
+    owner: root
+    group: root
+    mode: 0644
+  tags:
+    - mysql
+    - mysql-master
+
+- name: Import wordpress database
+  shell: mysql -u root -p{{ mysql_root_pwd }} wordpress < /root/wp.sql
+  register: import_db
+  when: mysql_init == true
+  tags:
+    - mysql
+    - mysql-master
+- debug:
+      var: import_db

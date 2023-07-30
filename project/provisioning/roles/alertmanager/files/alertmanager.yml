@@ -1,0 +1,18 @@
+global:
+  slack_api_url: "https://hooks.slack.com/services/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"
+
+route:
+  group_by: ['instance', 'severity']
+  group_wait: 10s
+  group_interval: 10s
+  repeat_interval: 5m
+  routes:
+  - match:
+      alertname: InstanceDown
+  receiver: 'alert-channel'
+
+receivers:
+- name: 'alert-channel'
+  slack_configs:
+  - channel: "#alert-channel"
+    text: "summary: {{ .CommonAnnotations.summary }}\ndescription: {{ .CommonAnnotations.description }}"

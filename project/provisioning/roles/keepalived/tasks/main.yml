@@ -1,0 +1,28 @@
+---
+- name: Install keepalived (Centos)
+  yum: name=keepalived state=present
+  when: ansible_os_family == "RedHat"
+  tags: keepalived
+  notify: restart keepalived
+
+- name: Copy chk_service script
+  template: 
+    src: check_script.sh.j2 
+    dest: /etc/keepalived/check_script.sh
+    mode: 0755
+    owner: root
+    group: root
+  tags: keepalived
+  notify: restart keepalived
+
+- name: Copy configuration of keepalived
+  template: src=keepalived.conf.j2 dest=/etc/keepalived/keepalived.conf
+  tags: keepalived
+  notify: restart keepalived
+
+- name: Start keepalived
+  service: 
+    name: keepalived
+    state: started
+    enabled: true
+  tags: keepalived
